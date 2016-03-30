@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
 		
 		self.p = [0.1, 0.2, 0.3, 0.4]
 		self.MMN_obj.set_alpha_p(self.p)
-		np.testing.assert_almost_equal(self.p, self.MMN_obj.get_p())
+		np.testing.assert_almost_equal(self.p, self.MMN_obj.get_p().flatten())
 
 
 	def compare_gradient_f(self):
@@ -60,8 +60,8 @@ class Test(unittest.TestCase):
 			alpha_eps =cp.deepcopy(self.MMN_obj.alpha)
 			alpha_eps[i] += self.eps
 			llik2, grad_eps, H_eps = self.MMN_obj.get_f_grad_hess(alpha_eps)  # @UnusedVariable
-			np.testing.assert_almost_equal(grad[i], (llik2-llik)/self.eps, decimal = 3)
-			H_est[i,:] = (grad_eps - grad) /self.eps
+			np.testing.assert_almost_equal(grad[i], (llik2[0]-llik[0])/self.eps, decimal = 3)
+			H_est[i,:] = (grad_eps - grad).flatten() /self.eps
 			
 			
 		np.testing.assert_almost_equal(H, (H_est + H_est.T)/2., decimal = 3)		
@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
 			alpha_eps[i] += self.eps
 			llik2, grad_eps, H_eps = self.MMN_obj.get_llik_grad_hess(alpha_eps)  # @UnusedVariable
 			np.testing.assert_almost_equal(grad[i], (llik2-llik)/self.eps, decimal = 3)
-			H_est[i,:] = (grad_eps - grad) /self.eps
+			H_est[i,:] = (grad_eps - grad).flatten() /self.eps
 			
 		np.testing.assert_almost_equal(H, (H_est + H_est.T)/2., decimal = 3)
 		
@@ -87,11 +87,11 @@ class Test(unittest.TestCase):
 		self.set_prior()
 		self.MMN_obj.set_alpha_p(self.p)
 		llik, grad, H = self.MMN_obj.get_lprior_grad_hess()
-		mu_a = self.MMN_obj.alpha - self.mu
+		mu_a = self.MMN_obj.alpha.flatten() - self.mu
 		Q = np.linalg.inv(self.Sigma)
-		llik_true = - np.dot(mu_a.T, np.dot(Q,mu_a))/2
+		llik_true = - np.dot(mu_a, np.dot(Q,mu_a.T))/2
 		np.testing.assert_almost_equal(llik, llik_true, decimal = 7)
-		np.testing.assert_almost_equal(grad, - np.dot(Q, mu_a), decimal = 7)
+		np.testing.assert_almost_equal(grad.flatten(), - np.dot(Q, mu_a), decimal = 7)
 		np.testing.assert_almost_equal(H, -Q , decimal = 7)
 		#self.MMN_obj
 	

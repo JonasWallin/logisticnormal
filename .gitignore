@@ -1,6 +1,8 @@
 *.pyc
 *.so
-distribution_cython.c
-logisticNormal.c
+logisticnormal/distribution_cython.c
+logisticnormal/logisticNormal.c
 build/
+dist/
+logisticnormal.egg-info/
 *.DS_Store

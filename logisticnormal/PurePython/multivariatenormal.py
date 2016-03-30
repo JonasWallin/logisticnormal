@@ -85,7 +85,7 @@ class multivariatenormal(object):
 			return X
 		"""
 		if not self.Y is None:
-			mu_sample = self.Q_pmu_p + np.dot(self.Sigma, self.sumY)
+			mu_sample = self.Q_pmu_p + np.linalg.solve(self.Sigma, self.sumY)
 			Sigma_sample =  self.Q_p + self.n * self.Q
 		else:
 			mu_sample = self.Q_pmu_p

@@ -66,7 +66,7 @@ class multivariatenormal_base(object):
 		self.Y = np.empty((self.sim,2))
 		L = np.linalg.cholesky(self.param['Sigma'])
 		for i in range(self.sim):  # @UnusedVariable
-			self.Y[i,:] = np.dot(L,np.random.randn(2,1)).reshape((2,))
+			self.Y[i,:] = np.dot(L, np.random.randn(2,1)).reshape((2,))
 		self.dist = self.mv(prior = self.prior, param = self.param)
 		
 		
@@ -96,22 +96,19 @@ class multivariatenormal_base(object):
 	def test_sample(self):
 		
 		startup = [self.startup1, self.startup2]
-		for start in startup:
+		for j, start in enumerate(startup):
 			start()
 			self.dist.set_data(self.Y)
 			mu_est = np.zeros((self.sim,self.dist.mu_p.shape[0]))
 			
 			for i in range(self.sim):
 				mu_est[i,:] = self.dist.sample()
-				
-				
-			np.testing.assert_array_almost_equal(np.mean(self.Y,0),np.mean(mu_est,0),decimal=1) 
-			np.testing.assert_array_almost_equal(np.cov(self.Y.T)/self.Y.shape[0],np.cov(mu_est.T),decimal=1) 
+			np.testing.assert_array_almost_equal(np.mean(self.Y,0),np.mean(mu_est,0),decimal=2) 
+			np.testing.assert_array_almost_equal(np.cov(self.Y.T)/self.Y.shape[0],np.cov(mu_est.T),decimal=2) 
 
 	def test_sample2(self):
 		"""
 			strong prior should make the sample of X less then the mean of Y
-		
 		"""
 		n  =2000
 		prior = {'mu':np.array([-10,-10]),'Sigma':10**-2*np.eye(2)}
@@ -139,6 +136,7 @@ class Test_MV_python(unittest.TestCase,multivariatenormal_base):
 
 
 	def setUp(self):
+		print('python')
 		self.mv = mv_python
 
 
@@ -153,6 +151,7 @@ class Test_MV(unittest.TestCase,multivariatenormal_base):
 
 
 	def setUp(self):
+		print('cython')
 		self.mv = mv
 
 

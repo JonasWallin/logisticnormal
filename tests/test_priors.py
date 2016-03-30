@@ -123,7 +123,7 @@ class Test_normal_p_wishart(unittest.TestCase):
 				Sigma_mean += self.dist.param['Sigma']
 			mu_mean    /= self.sim
 			Sigma_mean /= self.sim
-			np.testing.assert_array_almost_equal(mu_mean, self.param['theta'],decimal = 1)
+			np.testing.assert_array_almost_equal(mu_mean   , self.param['theta'],decimal = 1)
 			np.testing.assert_array_almost_equal(Sigma_mean, self.param['Sigma'],decimal = 1)
 		
 

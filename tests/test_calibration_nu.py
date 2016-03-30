@@ -21,7 +21,7 @@ class test_nu(unittest.TestCase):
 	def simulate(self, n):
 		
 		nu_t = 20
-		r = np.array([5,-2,1,0])
+		r = np.array([5, -2, 1, 0])
 		d = len(r)
 		Q = spl.toeplitz(r) / nu_t
 		
@@ -35,7 +35,7 @@ class test_nu(unittest.TestCase):
 		iterations = 10000
 		self.nus = np.zeros(iterations)
 		for i in range(iterations):
-			self.nus[i] = self.nu.sample(sigma = 2,iterations = 10)
+			self.nus[i] = self.nu.sample()
 		self.nu_vec = range(nu_t-10,nu_t+10)
 		lik_  = np.array([self.nu.loglik(nu_) for nu_ in self.nu_vec])
 		lik_  -= np.max(lik_)
