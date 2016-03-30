@@ -1,0 +1,6 @@
+*.pyc
+*.so
+distribution_cython.c
+logisticNormal.c
+build/
+*.DS_Store
