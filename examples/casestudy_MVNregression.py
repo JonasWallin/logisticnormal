@@ -1,5 +1,5 @@
 '''
-Artifical example for testing if the class multivariatenormal_regression, works
+Artifical example for testing if the class MultivariatenormalRegression, works
 
 Created on Mar 17, 2016
 
@@ -10,7 +10,7 @@ import numpy as np
 import numpy.random as npr
 import time
 
-from logisticnormal import multivariatenormal_regression
+from logisticnormal import MultivariatenormalRegression
 
 beta = 2*npr.rand(10, 1) - 0.5
 N = 1000           # number of observations
@@ -54,7 +54,7 @@ Sigma_post = np.linalg.inv(Q_post)
 print(mu_post)
 
 
-MVNRegObj = multivariatenormal_regression({'mu': mu, 'Sigma':V})
+MVNRegObj = MultivariatenormalRegression({'mu': mu, 'Sigma':V})
 
 X0 = MVNRegObj.sample()
 MVNRegObj.setY(Ys)

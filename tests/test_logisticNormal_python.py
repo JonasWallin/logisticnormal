@@ -9,7 +9,7 @@ import numpy as np
 import copy as cp
 import numpy.random as npr
 
-from logisticnormal.PurePython import logisticMNormal as logisticMNormal_python
+from logisticnormal.PurePython import LogisticMNormal as LogisticMNormal_python
 
 
 class Test(unittest.TestCase):
@@ -21,7 +21,7 @@ class Test(unittest.TestCase):
 
 	def setUp(self):
 		npr.seed(123456)
-		self.MMN_obj = logisticMNormal_python()
+		self.MMN_obj = LogisticMNormal_python()
 	
 	def set_data1(self):
 		self.n   = 10**3

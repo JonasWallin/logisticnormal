@@ -6,7 +6,7 @@ Created on Jul 2, 2014
 import numpy as np
 import cPickle as pickle
 
-from .distribution_cython import invWishart, multivariatenormal, Wishart  # @UnresolvedImport
+from .distribution_cython import invWishart, Multivariatenormal, Wishart  # @UnresolvedImport
 from .PurePython.priors import nu_class
 
 
@@ -32,7 +32,7 @@ class normal_p_wishart(object):
             param['theta'] -> dict ['Sigma']
             param['Sigma'] -> dict ['theta']
         """
-        self.theta_class = multivariatenormal()
+        self.theta_class = Multivariatenormal()
         self.Sigma_class = invWishart()
         self.param = {}
         if not prior is None:

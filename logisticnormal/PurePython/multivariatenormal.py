@@ -9,7 +9,7 @@ import numpy as np
 import cPickle as pickle
 
 
-class multivariatenormal(object):
+class Multivariatenormal(object):
 	'''
 		Class for sampling from a Multivariate normal distribution on the form
 		f(X| Y, \Sigma, \mu_p, \Sigma_p) \propto N(Y; X, \Sigma) N(X; \mu_p, \Sigma_p)
@@ -29,7 +29,7 @@ class multivariatenormal(object):
 			load object from file
 			use:
 			
-			object = multivariatenormal.unpickle(filename)
+			object = Multivariatenormal.unpickle(filename)
 		"""
 		with file(filename, 'rb') as f:
 			return pickle.load(f)	

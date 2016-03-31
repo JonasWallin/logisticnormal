@@ -11,14 +11,14 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-from logisticnormal.PurePython import logisticNormal as MMN
+from logisticnormal.PurePython import logisticmnormal as MMN
 
 n = 10000
 sim = 200
 if __name__ == "__main__":
 	p = [0.1,0.1,0.5,0.3]
 	Y = np.random.multinomial(n, p, size=1)
-	MMN_obj = MMN.logisticMNormal()
+	MMN_obj = MMN.LogisticMNormal()
 	MMN_obj.sigma_MCMC = 1
 	MMN_obj.set_data(Y)
 	A = np.random.randn(len(p) - 1, len(p) - 1)

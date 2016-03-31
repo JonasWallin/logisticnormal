@@ -8,11 +8,11 @@ import numpy as np
 import scipy.linalg as spl
 import os
 
-from logisticnormal.PurePython import multivariatenormal as mv_python
-from logisticnormal import multivariatenormal as mv  # @UnresolvedImport
+from logisticnormal.PurePython import Multivariatenormal as mv_python
+from logisticnormal import Multivariatenormal as mv  # @UnresolvedImport
 
 
-class multivariatenormal_base(object):
+class Multivariatenormal_base(object):
 	sim = 5000
 	
 	def __init__(self):
@@ -132,7 +132,7 @@ class multivariatenormal_base(object):
 		np.testing.assert_array_almost_equal(np.mean(mu_est,0), true_mean, decimal=1)
 
 
-class Test_MV_python(unittest.TestCase,multivariatenormal_base):
+class Test_MV_python(unittest.TestCase,Multivariatenormal_base):
 
 
 	def setUp(self):
@@ -147,7 +147,7 @@ class Test_MV_python(unittest.TestCase,multivariatenormal_base):
 	def testName(self):
 		pass
 
-class Test_MV(unittest.TestCase,multivariatenormal_base):
+class Test_MV(unittest.TestCase,Multivariatenormal_base):
 
 
 	def setUp(self):
