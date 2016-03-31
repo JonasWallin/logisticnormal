@@ -9,7 +9,8 @@ import numpy as np
 import numpy.random as npr
 import time
 
-from logisticnormal import MultivariatenormalScaling
+from logisticnormal.distribution_cython import MultivariatenormalScalingCython as MultivariatenormalScaling
+
 
 beta = - 0.01*(npr.rand(2, 1) + 1)
 d = beta.shape[0]  # number of covariates

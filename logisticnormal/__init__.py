@@ -1,5 +1,5 @@
 from .distribution_cython import Multivariatenormal, invWishart, Wishart  # @UnresolvedImport
-from .distribution_cython import MultivariatenormalRegression, MultivariatenormalScaling  # @UnresolvedImport
+from .distribution_cython import MultivariatenormalRegression
 from .priors import normal_p_wishart, Wishart_p_nu
 from .logisticmnormal import LogisticMNormal  # @UnresolvedImport
 __all__ = ['Multivariatenormal',
@@ -8,5 +8,5 @@ __all__ = ['Multivariatenormal',
            'Wishart',
            'Wishart_p_nu',
            'LogisticMNormal',
-           'MultivariatenormalRegression',
-           'MultivariatenormalScaling']
+           'MultivariatenormalRegression']
+
