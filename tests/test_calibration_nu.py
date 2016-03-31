@@ -32,7 +32,7 @@ class test_nu(unittest.TestCase):
 		self.nu.set_parameter(param)
 		invwishartrand
 		self.nu.set_data([invwishartrand(nu_t, Q) for i in range(n)])
-		iterations = 10000
+		iterations = 15000
 		self.nus = np.zeros(iterations)
 		for i in range(iterations):
 			self.nus[i] = self.nu.sample()
@@ -44,7 +44,7 @@ class test_nu(unittest.TestCase):
 		self.lik_ = lik_
 	def test_mean(self):
 		
-		ns = [10,100,1000]
+		ns = [300,1000]
 		
 		for n in ns:
 			self.simulate(n)
