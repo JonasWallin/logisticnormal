@@ -7,7 +7,7 @@ import numpy as np
 import numpy.random as npr
 import cPickle as pickle
 
-from .distribution_cython import invWishart, multivariatenormal, Wishart , multivariatenormal_scaling_cython # @UnresolvedImport
+from .distribution_cython import invWishart, Multivariatenormal, Wishart, MultivariatenormalScalingCython  # @UnresolvedImport
 from .PurePython.priors import nu_class
 
 
@@ -33,7 +33,7 @@ class normal_p_wishart(object):
 			param['theta'] -> dict ['Sigma']
 			param['Sigma'] -> dict ['theta']
 		"""
-		self.theta_class = multivariatenormal()
+		self.theta_class = Multivariatenormal()
 		self.Sigma_class = invWishart()
 		self.param = {}
 		if not prior is None:
@@ -234,7 +234,7 @@ class Wishart_p_nu(object):
 			return pickle.load(f)
 	
 	
-class multivariatenormal_scaling(object):
+class MultivariatenormalScaling(object):
 	"""
 		Class for sampling posterior distribution of scaling of covaraince matrix for multivariate normal
 		The model is:
@@ -246,7 +246,7 @@ class multivariatenormal_scaling(object):
 	
 	def __init__(self, priors = None):
 		
-		self.cythonObj = multivariatenormal_scaling_cython(priors)
+		self.cythonObj = MultivariatenormalScalingCython(priors)
 		self.X = None
 		self.sigma_MCMC = 1.
 		

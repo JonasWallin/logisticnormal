@@ -27,17 +27,17 @@ cdef inv(np.ndarray[np.double_t, ndim=2] X):
 	
 def rebuild_multivariatenormal(param, prior, data_obj):
 	"""
-		Used for pickling and unpickling multivariatenormal class
+		Used for pickling and unpickling Multivariatenormal class
 	
 	"""
-	obj 	    	= multivariatenormal(param, prior)
+	obj 	    	= Multivariatenormal(param, prior)
 	obj.n   	    = data_obj['n']
 	obj.sumY	    = data_obj['sumY']
 	return obj
 
 
 
-cdef class multivariatenormal_scaling_cython:
+cdef class MultivariatenormalScalingCython:
 	"""
 		Class for sampling posterior distribution of scaling of covaraince matrix for multivariate normal
 		The model is:
@@ -60,9 +60,9 @@ cdef class multivariatenormal_scaling_cython:
 		'''
 		self.n = 0
 		if not prior is None:
-			self.setprior(prior)
+			self.set_prior(prior)
 
-	def setprior(self, prior):
+	def set_prior(self, prior):
 		
 		self.mu_p = np.empty_like(prior['mu'])
 		self.mu_p[:] = prior['mu'][:]
@@ -75,7 +75,7 @@ cdef class multivariatenormal_scaling_cython:
 
 	@cython.boundscheck(False)
 	@cython.wraparound(False)	
-	def setprior0(self, d ):# @DuplicatedSignature
+	def set_prior0(self, d ):# @DuplicatedSignature
 		"""
 			Deafult values non informative values
 		"""
@@ -275,7 +275,7 @@ cdef class multivariatenormal_scaling_cython:
 										  self.B[i,:,:]))									
 		return llik
 
-cdef class  multivariatenormal_regression:
+cdef class  MultivariatenormalRegression:
 	'''
 		Class for sampling posterior distribution of covariates of coeffients in regression.
 		The model has the form
@@ -297,9 +297,9 @@ cdef class  multivariatenormal_regression:
 		'''
 		self.n = 0
 		if not prior is None:
-			self.setprior(prior)
+			self.set_prior(prior)
 
-	def setprior(self, prior):
+	def set_prior(self, prior):
 		
 		self.mu_p = np.empty_like(prior['mu'])
 		self.mu_p[:] = prior['mu'][:]
@@ -317,7 +317,7 @@ cdef class  multivariatenormal_regression:
 			
 	@cython.boundscheck(False)
 	@cython.wraparound(False)	
-	def setprior0(self, d ):# @DuplicatedSignature
+	def set_prior0(self, d ):# @DuplicatedSignature
 		"""
 			Deafult values non informative values
 		"""
@@ -457,7 +457,7 @@ cdef class  multivariatenormal_regression:
 		return self._sample()
 			
 			
-cdef class  multivariatenormal:
+cdef class  Multivariatenormal:
 	'''
 		Class for sampling from a Multivariate normal distribution on the form
 		f(X| Y, \Sigma, \mu_p, \Sigma_p) \propto N(Y; X, \Sigma) N(X; \mu_p, \Sigma_p)
@@ -505,7 +505,7 @@ cdef class  multivariatenormal:
 			load object from file
 			use:
 			
-			object = multivariatenormal.unpickle(filename)
+			object = Multivariatenormal.unpickle(filename)
 		"""
 		with file(filename, 'rb') as f:
 			return pickle.load(f)	

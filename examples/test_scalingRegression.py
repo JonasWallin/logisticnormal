@@ -9,7 +9,7 @@ import numpy as np
 import numpy.random as npr
 import time
 
-from logisticnormal.priors import multivariatenormal_scaling
+from logisticnormal.priors import MultivariatenormalScaling
 
 beta = - 0.01*(npr.rand(2, 1) + 1)
 d = beta.shape[0]  # number of covariates
@@ -39,7 +39,7 @@ for i in range(N):
 print("****")
 # setting up object
 
-MVNscaleObj = multivariatenormal_scaling({'mu': mu, 'Sigma':V})
+MVNscaleObj = MultivariatenormalScaling({'mu': mu, 'Sigma':V})
 
 
 beta = beta.flatten()

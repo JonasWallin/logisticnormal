@@ -6,7 +6,7 @@ import cPickle as pickle
 cdef extern void outer_Y(double* YYt, const double* Y, const int n, const int d) nogil
 
 
-cdef class logisticMNormal:
+cdef class LogisticMNormal:
 	"""
 		Class for sampling and storing logistic Multivariate normal distribution
 		
@@ -64,7 +64,7 @@ cdef class logisticMNormal:
 			load object from file
 			use:
 			
-			object = multivariatenormal.unpickle(filename)
+			object = Multivariatenormal.unpickle(filename)
 		"""
 		with file(filename, 'rb') as f:
 			return pickle.load(f)	

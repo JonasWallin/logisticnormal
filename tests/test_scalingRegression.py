@@ -9,7 +9,7 @@ import os
 import numpy as np
 import numpy.random as npr
 
-from logisticnormal.distribution_cython import multivariatenormal_scaling_cython as multivariatenormal_scaling # @UnresolvedImport
+from logisticnormal.distribution_cython import MultivariatenormalScalingCython as MultivariatenormalScaling  # @UnresolvedImport
 
 class Test_scaling_cython(unittest.TestCase):
 	
@@ -86,7 +86,7 @@ class Test_scaling_cython(unittest.TestCase):
 			and that the (not used in object) Hessian is correctly
 			computed
 		"""
-		MVNscaleObj = multivariatenormal_scaling({'mu': self.mu, 'Sigma':self.V})
+		MVNscaleObj = MultivariatenormalScaling({'mu': self.mu, 'Sigma':self.V})
 		
 		
 		beta = self.beta.flatten()
@@ -129,7 +129,7 @@ class Test_scaling_cython(unittest.TestCase):
 		
 	
 	def lik_run(self):
-		MVNscaleObj = multivariatenormal_scaling({'mu': self.mu, 'Sigma':self.V})
+		MVNscaleObj = MultivariatenormalScaling({'mu': self.mu, 'Sigma':self.V})
 		
 		
 		beta = self.beta.flatten()

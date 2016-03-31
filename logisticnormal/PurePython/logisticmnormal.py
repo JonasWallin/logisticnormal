@@ -16,7 +16,7 @@ import cPickle as pickle
 #TODO: make adjustment so n can contain NaN in which case
 #	   we sample alpha with missing value!
 
-class logisticMNormal(object):
+class LogisticMNormal(object):
 	"""
 		Class for sampling and storing multilogit normal distirbution:
 
@@ -40,7 +40,7 @@ class logisticMNormal(object):
 			load object from file
 			use:
 
-			object = multivariatenormal.unpickle(filename)
+			object = Multivariatenormal.unpickle(filename)
 		"""
 		with file(filename, 'rb') as f:
 			return pickle.load(f)

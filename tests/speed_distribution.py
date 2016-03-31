@@ -32,8 +32,8 @@ import numpy as np
 import scipy.linalg as spl
 import time
 
-from logisticnormal.PurePython import multivariatenormal as mv_python
-from logisticnormal import multivariatenormal as mv, Wishart  # @UnresolvedImport
+from logisticnormal.PurePython import Multivariatenormal as mv_python
+from logisticnormal import Multivariatenormal as mv, Wishart  # @UnresolvedImport
 from logisticnormal.PurePython import invWishart as invWis_python, Wishart as Wis_python
 from logisticnormal import invWishart as invWis
 from logisticnormal.PurePython.wishart import invwishartrand
