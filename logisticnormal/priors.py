@@ -326,7 +326,27 @@ class multivariatenormal_scaling(object):
 
 		self.X    = np.zeros_like(X)
 		self.X[:] = X[:]
+		self.sigma_MCMC = 0.234 / len(X)
 
+
+	def _HMC_objs(self, X):
+		"""
+			computes the objects needed to sample from the posterior 
+
+			X  - (d x 1) the coeffients
+		"""
+
+		lik  = self.cythonObj.hesslik(X)
+		grad = self.cythonObj.grad
+		Hess = self.cythonObj.Hessian
+
+		L    	 = np.linalg.cholesky( - Hess_old) 
+		Lg       = np.linalg.solve(L, grad)
+		LtLg     = np.linalg.solve(L.T, Lg)
+
+		mu       = X + ( self.sigma_MCMC**2 * 0.5) * LtLg
+
+		return lik, mu, Hess, L
 	def sample(self, z = None):
 		"""
 			Sampling using AMCMC MALA with preconditioner as Hessian
@@ -340,16 +360,31 @@ class multivariatenormal_scaling(object):
 		if self.X is None:
 			raise Exception('Needs a start value use .setX')
 
-		lik_old  = self.cythonObj.hesslik(X)
-		grad_old = self.cythonObj.grad
-		Hess_old = self.cythonObj.Hessian
+		lik_old, mu_old, Hess_old, L_old = self._HMC_objs( self.X)
 
-		L_old	 = np.linalg.cholesky( - Hess_old) 
-		Lg_old   = np.linalg.solve(L, grad)
-		LtLg_old = np.linalg.solve(L.T, 0.5 * Lg)
-
+		Xs = mu_old + np.linalg.solve(L_old.T, self.sigma_MCMC * z)
 
 		# sampling new realization
 
 		mu_old = self.X  + self.LtLg * self.sigma_MCMC**2
 		Xs     = mu_old  + np.linalg.solve(L_old.T, self.sigma_MCMC * z)
+
+		lik_star, mu_star, Hess_star, L_star = self._HMC_objs( Xs)
+
+		res_old = X  - mu_star
+		res     = Xs - mu_old
+
+		q_star = -(0.5/self.sigma_MCMC**2) *  np.dot( res,
+											          np.dot(-Hess_old, res) )   
+		q_old  = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, 
+												      np.dot(-Hess_star , res_old) )
+		
+		U = np.random.rand(1)
+
+		if np.log(U) < lik_star - lik_old + q_old - q_star:	
+
+			self.X = Xs
+
+		X_out = np.zeros_like(self.X)
+		X_out[:] = self.X[:]
+		return X_out
