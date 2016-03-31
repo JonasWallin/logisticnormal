@@ -37,7 +37,7 @@ def rebuild_multivariatenormal(param, prior, data_obj):
 
 
 
-cdef class multivariatenormal_scaling:
+cdef class multivariatenormal_scaling_cython:
 	"""
 		Class for sampling posterior distribution of scaling of covaraince matrix for multivariate normal
 		The model is:
@@ -47,7 +47,7 @@ cdef class multivariatenormal_scaling:
 	"""
 
 	cdef public np.ndarray SigmaY, Q_p, mu_p, Sigma_p, X, QY, Y, B
-	cdef public np.ndarray grad
+	cdef public np.ndarray grad, Hessian
 	cdef public long int d, n, k
 
 	@cython.boundscheck(False)
@@ -196,6 +196,22 @@ cdef class multivariatenormal_scaling:
 		
 		return self._loglik(X)
 	
+	
+	
+	@cython.boundscheck(False)
+	@cython.wraparound(False) 	
+	def hesslik(self, np.ndarray[np.double_t, ndim=1, mode='c']  X):
+		
+		"""
+			computing the Hessian, the gradient and value
+			 of the loglikelihood for model defined in description,
+			 gradient is stored in self.grad and
+			 hessian is stored in self.Hessian
+			X - (d x 1) the covariates
+		"""
+		
+		return self._loglik(X, 1, 1)
+	
 	@cython.boundscheck(False)
 	@cython.wraparound(False) 	
 	def gradlik(self,  np.ndarray[np.double_t, ndim=1, mode='c']  X):
@@ -210,10 +226,14 @@ cdef class multivariatenormal_scaling:
 	
 	@cython.boundscheck(False)
 	@cython.wraparound(False) 	
-	cdef _loglik(self, np.ndarray[np.double_t, ndim=1, mode='c']  X, int compute_gradient = 0 ):
+	cdef _loglik(self, 
+				np.ndarray[np.double_t, ndim=1, mode='c']  X, 
+				int compute_gradient = 0 ,
+				int compute_Ehessian  = 0):
 		"""
 			Computes function propotional to the likelihood X in the model defined at the top
 		"""
+		cdef np.ndarray[np.double_t, ndim=1, mode='c'] StQ
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] B_iX
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] D_Y
 		cdef double llik = -0.5  * np.dot( (X - self.mu_p).transpose(),
@@ -222,6 +242,10 @@ cdef class multivariatenormal_scaling:
 		
 		if compute_gradient != 0:
 			self.grad = -np.dot(self.Q_p,X - self.mu_p )
+		
+		if compute_Ehessian != 0:
+			self.Hessian = - self.Q_p
+		
 			
 		if self.n != 0:
 			
@@ -230,6 +254,12 @@ cdef class multivariatenormal_scaling:
 			B_iX = np.zeros(self.QY.shape[0])
 			D_Y  = np.zeros(self.QY.shape[0])
 			QDY  = np.zeros(self.QY.shape[0])
+			
+			if compute_Ehessian != 0:
+				if self.SigmaY is None:
+					self.SigmaY = np.linalg.inv(self.QY)
+				StQ = self.QY * self.SigmaY + np.eye(self.QY.shape[0]) # Hadamard product
+			
 			for i in range(self.n):
 				B_iX[:] = np.dot(self.B[i, :, :], X)
 				
@@ -239,7 +269,9 @@ cdef class multivariatenormal_scaling:
 				llik   -= 0.5 * np.dot(D_Y.transpose(), QDY ) 
 				if compute_gradient != 0:
 					self.grad += np.dot(self.B[i,:,:].transpose(), -1. + D_Y * QDY )
-				#TODO add a set Q and Sigma
+				if compute_Ehessian != 0:
+					self.Hessian-= np.dot(self.B[i,:,:].transpose(), np.dot(StQ,
+										  self.B[i,:,:]))									
 		return llik
 
 cdef class  multivariatenormal_regression:
