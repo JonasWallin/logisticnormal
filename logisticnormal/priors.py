@@ -297,7 +297,7 @@ class MultivariatenormalScaling(object):
 			Y     - (nxd) numpy vector , the data where n number of observation, d - dimension of data
 		"""
 
-		self.cythonObj.setQYaSigmaY( Y)
+		self.cythonObj.setY( Y)
 
 	def setData(self, Y = None,
 					  SigmaY = None,
@@ -326,7 +326,8 @@ class MultivariatenormalScaling(object):
 
 		self.X    = np.zeros_like(X)
 		self.X[:] = X[:]
-		self.sigma_MCMC = 0.234 / len(X)
+		self.d  = len(X)
+		self.sigma_MCMC = .2348 / (self.d**(1./6))
 
 
 	def _HMC_objs(self, X):
@@ -340,7 +341,7 @@ class MultivariatenormalScaling(object):
 		grad = self.cythonObj.grad
 		Hess = self.cythonObj.Hessian
 
-		L    	 = np.linalg.cholesky( - Hess_old) 
+		L    	 = np.linalg.cholesky( - Hess) 
 		Lg       = np.linalg.solve(L, grad)
 		LtLg     = np.linalg.solve(L.T, Lg)
 
@@ -355,7 +356,7 @@ class MultivariatenormalScaling(object):
 		"""
 
 		if z is None:
-			z = npr.randn(d)
+			z = npr.randn(self.d)
 
 		if self.X is None:
 			raise Exception('Needs a start value use .setX')
@@ -366,12 +367,9 @@ class MultivariatenormalScaling(object):
 
 		# sampling new realization
 
-		mu_old = self.X  + self.LtLg * self.sigma_MCMC**2
-		Xs     = mu_old  + np.linalg.solve(L_old.T, self.sigma_MCMC * z)
+		lik_star, mu_star, Hess_star,_  = self._HMC_objs( Xs)
 
-		lik_star, mu_star, Hess_star, L_star = self._HMC_objs( Xs)
-
-		res_old = X  - mu_star
+		res_old = self.X  - mu_star
 		res     = Xs - mu_old
 
 		q_star = -(0.5/self.sigma_MCMC**2) *  np.dot( res,
@@ -380,7 +378,6 @@ class MultivariatenormalScaling(object):
 												      np.dot(-Hess_star , res_old) )
 		
 		U = np.random.rand(1)
-
 		if np.log(U) < lik_star - lik_old + q_old - q_star:	
 
 			self.X = Xs

@@ -175,14 +175,15 @@ cdef class MultivariatenormalScalingCython:
 			self.setY(Y)
 			
 		
+		if (QY is not None) and (SigmaY is not None):
+			self.setQYaSigmaY(SigmaY, QY)
+			
 		if (SigmaY is not None) and (QY is None):
 			self.setSigmaY(SigmaY)
 		
 		if QY is not None and (SigmaY is None):
 			self.setQY(QY)
 			
-		if QY is not None and (SigmaY is not None):
-			self.setQYaSigmaY(QY)
 
 	
 
@@ -233,7 +234,7 @@ cdef class MultivariatenormalScalingCython:
 		"""
 			Computes function propotional to the likelihood X in the model defined at the top
 		"""
-		cdef np.ndarray[np.double_t, ndim=1, mode='c'] StQ
+		cdef np.ndarray[np.double_t, ndim=2, mode='c'] StQ
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] B_iX
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] D_Y
 		cdef double llik = -0.5  * np.dot( (X - self.mu_p).transpose(),
