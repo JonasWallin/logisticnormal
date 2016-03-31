@@ -79,12 +79,17 @@ cdef class LogisticMNormal:
 				prior:
 					prior['mu']	- np.array(dim=1) (d-1)
 					prior['Sigma'] = np.array(dim=2) (d-1) x (d-1)
+					prior['Q'] = np.array(dim=2) (d-1) x (d-1)
 		"""
 		self.mu	   = np.zeros_like(prior['mu'])
 		self.mu[:]	= prior['mu'][:]
 		self.Sigma	= np.zeros_like(prior['Sigma'])
 		self.Sigma[:] = prior['Sigma'][:]
-		self.Q		= np.linalg.inv(self.Sigma)
+		if 'Q' in prior:
+			self.Q = np.zeros_like(prior['Q'])
+			self.Q = prior['Q'][:]
+		else:
+			self.Q		= np.linalg.inv(self.Sigma)
 		self.Q_mu	 = np.dot(self.Q,self.mu)
 		self.d		= self.Q_mu.shape[0] + 1
 
@@ -274,7 +279,7 @@ cdef class LogisticMNormal:
 
 	def set_data(self, np.ndarray n_in):
 		"""
-			n - (Kx1) numpy vector of observation count
+			n - (dx1) numpy vector of observation count
 		"""
 		self.n	= np.zeros(n_in.size)
 		self.n[:] = n_in.flatten()[:]
