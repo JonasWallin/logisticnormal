@@ -81,8 +81,8 @@ cdef class LogisticMNormal:
 					prior['Sigma'] = np.array(dim=2) (d-1) x (d-1)
 					prior['Q'] = np.array(dim=2) (d-1) x (d-1)
 		"""
-		self.mu	   = np.zeros_like(prior['mu'])
-		self.mu[:]	= prior['mu'][:]
+		self.mu	   = np.zeros_like(prior['mu'].flatten())
+		self.mu[:]	= prior['mu'].flatten()[:]
 		self.Sigma	= np.zeros_like(prior['Sigma'])
 		self.Sigma[:] = prior['Sigma'][:]
 		if 'Q' in prior:
@@ -127,7 +127,7 @@ cdef class LogisticMNormal:
 		"""
 		if alpha == None:
 			alpha = self.alpha
-
+		alpha = alpha.flatten()
 
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] exp_alpha = np.exp(alpha)
 		cdef double c_alpha = (1 + np.sum(exp_alpha))
@@ -162,8 +162,8 @@ cdef class LogisticMNormal:
 			setting alpha parameter
 		
 		"""
-		self.alpha = np.zeros_like(alpha)
-		self.alpha[:] = alpha[:]
+		self.alpha = np.zeros_like(alpha.flatten())
+		self.alpha[:] = alpha.flatten()[:]
 		if self.n != None and self.mu != None:
 			self.update_llik()
 			
@@ -212,34 +212,47 @@ cdef class LogisticMNormal:
 		"""
 			Sampling using AMCMC MALA with preconditioner as Hessian
 		"""
+		
+		if self.alpha is None:
+			raise Exception('alpha must be set use set_alpha')
+		
 		self.count_mcmc   += 1
 		self.amcmc_count  += 1
 		if z == None:
 			z =np.random.randn(self.d-1)
 		
-		mu = self.alpha  + self.LtLg *self.sigma_MCMC**2
-		alpha_s = np.linalg.solve(self.L.T, self.sigma_MCMC*z) + mu 
-		llik_s, grad_s, neg_Hessian_s, L_s, Lg_s, LtLg_s = self.update_llik(alpha_s)
 		
-		mu_s = alpha_s + LtLg_s * self.sigma_MCMC**2
-		a_mu_s = self.alpha - mu_s
-		a_s_mu = alpha_s - mu
-		q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( a_s_mu.T, np.dot(self.neg_Hessian, a_s_mu) )   
-		q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( a_mu_s.T, np.dot(neg_Hessian_s, a_mu_s) )
+		
+		llik_old, grad_old, neg_Hessian_old, L_old, Lg_old, LtLg_old = self.update_llik(self.alpha)
+		
+		mu         = self.alpha  + self.LtLg_old *self.sigma_MCMC**2
+		alpha_star = np.linalg.solve(self.L_old.T, self.sigma_MCMC*z) + mu 
+		llik_star, grad_star, neg_Hessian_star, _, __, LtLg_star = self.update_llik(alpha_star)
+		
+		mu_star = alpha_star + LtLg_star * self.sigma_MCMC**2
+		res_old  = self.alpha - mu_star
+		res_star  = alpha_star - mu
+		q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, np.dot(neg_Hessian_old,
+												   res_old))   
+		q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( res_star.T, np.dot(neg_Hessian_star,
+												   res_star) )
 		
 		U = np.random.rand(1)
 
-		if np.log(U) < llik_s - self.llik + q_o - q_s:	   
+		if np.log(U) < llik_star - self.llik_old + q_o - q_s:	   
 			self.accept_mcmc  += 1
 			self.amcmc_accept += 1
-			self.llik, self.grad, self.neg_Hessian, self.L, self.Lg, self.LtLg   =  llik_s, grad_s, neg_Hessian_s, L_s, Lg_s, LtLg_s
-			self.alpha = alpha_s
+			self.alpha = alpha_star
 		
 		
 			
 		if self.AMCMC:
 			
 			self.update_AMCMC()
+			
+		alpha    = np.zeros_like(self.alpha)
+		alpha[:] = self.alpha[:]
+		return alpha
 		
 	def set_AMCMC(self, batch = 50, accpate = 0.574, delta_rate = 1.):
 		"""
