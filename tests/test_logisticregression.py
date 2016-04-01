@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 
 from logisticnormal import LogisticRegression
+from logisticnormal import LogisticRegressionSampler
 
 
 class TestLogisticRegression(unittest.TestCase):
@@ -9,7 +10,7 @@ class TestLogisticRegression(unittest.TestCase):
     def startup(self):
         J = 10
         d = 5
-        self.lr = LogisticRegression( d=d)
+        self.lr = LogisticRegression(d=d)
 
         # data
         N = 10000
@@ -20,12 +21,13 @@ class TestLogisticRegression(unittest.TestCase):
 
         # covariates
         K = 2
-        Bs = [np.tile(range(j, K+j), (d-1, 1)) for j in range(J)]
-        mean_ind = np.arange(2)
+        covars = np.vstack([np.arange(j, K+j) for j in range(J)])
+        Bs = [np.hstack([covars[j, k]*np.eye(d-1) for k in range(K)]) for j in range(J)]  # [np.tile(range(j, K+j), (d-1, 1)) for j in range(J)]
+        mean_ind = np.arange(K*(d-1))
         self.lr.set_covariates(Bs, mean_ind)
 
         # prior
-        prior = {'a_mu': np.zeros(K), 'V_mu': np.eye(K),
+        prior = {'a_mu': np.zeros(K*(d-1)), 'V_mu': np.eye(K*(d-1)),
                  'W': np.eye(d-1), 'l': d+3}
         self.lr.set_prior(prior)
 
@@ -40,6 +42,12 @@ class TestLogisticRegression(unittest.TestCase):
         self.startup()
         for i in range(sim):
             self.lr.sample()
+
+    def test_logisticregressionsampler(self):
+        self.startup()
+        lrs = LogisticRegressionSampler(20, 10, 10)
+        lrs.set_sampling_object(self.lr)
+        lrs.run()
 
 
 if __name__ == '__main__':
