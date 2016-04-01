@@ -95,7 +95,7 @@ cdef class LogisticMNormal:
 
 	def get_lprior_grad_hess(self, alpha = None):
 	
-		if alpha == None:
+		if alpha is None:
 			alpha = self.alpha
 		
 		alpha_mu = alpha - self.mu
@@ -125,7 +125,7 @@ cdef class LogisticMNormal:
 			
 			alpha - (d-1 , ) vector of probability components 
 		"""
-		if alpha == None:
+		if alpha is None:
 			alpha = self.alpha
 		alpha = alpha.flatten()
 
@@ -150,7 +150,7 @@ cdef class LogisticMNormal:
 		"""
 			get the probabilities from the object 
 		"""
-		if alpha == None:
+		if alpha is None:
 			alpha = self.alpha
 			
 		p = np.hstack((1.,np.exp(alpha)))
@@ -188,7 +188,7 @@ cdef class LogisticMNormal:
 		"""
 		
 		store = False
-		if alpha == None:
+		if alpha is None:
 			store = True
 			alpha = self.alpha
 			
@@ -218,7 +218,7 @@ cdef class LogisticMNormal:
 		
 		self.count_mcmc   += 1
 		self.amcmc_count  += 1
-		if z == None:
+		if z is None:
 			z =np.random.randn(self.d-1)
 		
 		
@@ -298,6 +298,6 @@ cdef class LogisticMNormal:
 		self.n[:] = n_in.flatten()[:]
 		self.sum_n = np.sum(self.n)
 		
-		if self.alpha != None and self.mu != None:
+		if (self.alpha is not None) and (self.mu is not None):
 			self.llik, self.grad, self.Hessian = self.get_f_grad_hess(self.alpha)
 			self.L = np.linalg.cholesky(self.Hessian)

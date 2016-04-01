@@ -9,7 +9,7 @@ class TestLogisticRegression(unittest.TestCase):
     def startup(self):
         J = 10
         d = 5
-        self.lr = LogisticRegression(J=J, d=d)
+        self.lr = LogisticRegression( d=d)
 
         # data
         N = 10000
