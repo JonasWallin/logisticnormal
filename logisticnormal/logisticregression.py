@@ -19,7 +19,7 @@ class LogisticRegression(object):
         self.logistic_m_normals = [LogisticMNormal() for j in range(self.J)]
         self.multivariatenormal_regression = MultivariatenormalRegression()
         self.inv_wishart = invWishart()
-        self.inv_wishart.set_param({'theta': np.zeros((self.d-1,))})
+        self.inv_wishart.set_parameter({'theta': np.zeros((self.d-1,))})
 
         if not data is None:
             self.set_data(data)
@@ -39,16 +39,19 @@ class LogisticRegression(object):
         for nj, lmn in zip(np.split(n, self.J, axis=0), self.logistic_m_normals):
             lmn.set_data(nj.reshape(self.d, 1))
 
-    def set_covariates(self, Bs, mean_ind, cov_ind):
+    def set_covariates(self, Bs, mean_ind, cov_ind=None):
         '''
-            Bs          -   list of covariate matrices
+            Bs          -   list (length self.J) of covariate matrices
+                              (self.d x #covariates)
             mean_ind    -   indices of covariates affecting mean
             cov_ind     -   indices of covariates affecting covariance
         '''
         self.Bs = Bs
         self.Bs_mu = [B[:, mean_ind] for B in self.Bs]
-        self.multivariatenormal_regression.setB(np.vstack([Bj_mu[np.newaxis, :, :] for Bj_mu in self.Bs_mu]))
-        self.Bs_sigma = [B[:, cov_ind] for B in self.Bs]  # not used currently
+        self.multivariatenormal_regression.setB(
+            np.ascontiguousarray(np.vstack([Bj_mu[np.newaxis, :, :] for Bj_mu in self.Bs_mu]), dtype=np.float))
+        if not cov_ind is None:
+            self.Bs_sigma = [B[:, cov_ind] for B in self.Bs]
 
     def init(self):
         for lmn in self.logistic_m_normals:
@@ -59,7 +62,7 @@ class LogisticRegression(object):
 
         A = self.alphas.reshape(-1, 1)
         B = np.vstack(self.Bs_mu)
-        self.beta_mu = np.linalg.lstsq(B, A).reshape(-1)
+        self.beta_mu = np.linalg.lstsq(B, A)[0].reshape(-1)
 
         r = self.alphas - self.mus
         self.Sigma = np.dot(r.T, r)*1./self.J
@@ -78,7 +81,7 @@ class LogisticRegression(object):
 
     @property
     def beta_mu(self):
-        return self._mus
+        return self._beta_mu
 
     @beta_mu.setter
     def beta_mu(self, beta_mu):
