@@ -164,7 +164,7 @@ cdef class LogisticMNormal:
 		"""
 		self.alpha = np.zeros_like(alpha.flatten())
 		self.alpha[:] = alpha.flatten()[:]
-		if self.n != None and self.mu != None:
+		if not self.n is None and not self.mu is None:
 			self.update_llik()
 			
 			
@@ -225,8 +225,8 @@ cdef class LogisticMNormal:
 		
 		llik_old, grad_old, neg_Hessian_old, L_old, Lg_old, LtLg_old = self.update_llik(self.alpha)
 		
-		mu         = self.alpha  + self.LtLg_old *self.sigma_MCMC**2
-		alpha_star = np.linalg.solve(self.L_old.T, self.sigma_MCMC*z) + mu 
+		mu         = self.alpha  + LtLg_old *self.sigma_MCMC**2
+		alpha_star = np.linalg.solve(L_old.T, self.sigma_MCMC*z) + mu 
 		llik_star, grad_star, neg_Hessian_star, _, __, LtLg_star = self.update_llik(alpha_star)
 		
 		mu_star = alpha_star + LtLg_star * self.sigma_MCMC**2
@@ -239,7 +239,7 @@ cdef class LogisticMNormal:
 		
 		U = np.random.rand(1)
 
-		if np.log(U) < llik_star - self.llik_old + q_o - q_s:	   
+		if np.log(U) < llik_star - llik_old + q_o - q_s:	   
 			self.accept_mcmc  += 1
 			self.amcmc_accept += 1
 			self.alpha = alpha_star

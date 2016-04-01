@@ -13,8 +13,8 @@ class TestLogisticRegression(unittest.TestCase):
 
         # data
         N = 10000
-        p = np.arange(1, d+1)
-        p *= 1./np.sum(p)
+        p = np.arange(d, 0, -1, dtype=np.float)
+        p /= np.sum(p)
         n = np.random.multinomial(N, p, size=J)
         self.lr.set_data(n)
 
