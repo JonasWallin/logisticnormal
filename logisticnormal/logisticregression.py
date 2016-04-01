@@ -47,25 +47,57 @@ class LogisticRegression(object):
         '''
         self.Bs = Bs
         self.Bs_mu = [B[:, mean_ind] for B in self.Bs]
-        self.multivariatenormal_regression.setB(np.vstack([B_i_mu[np.newaxis, :, :] for B_i_mu in self.Bs_mu]))
+        self.multivariatenormal_regression.setB(np.vstack([Bj_mu[np.newaxis, :, :] for Bj_mu in self.Bs_mu]))
         self.Bs_sigma = [B[:, cov_ind] for B in self.Bs]  # not used currently
 
-    # def init(self):
-    #     p = 
+    def init(self):
+        for lmn in self.logistic_m_normals:
+            p = lmn.n
+            p *= 1./np.sum(p)
+            lmn.set_alpha_p(p)
+        self.update_alphas()
+
+        A = self.alphas.reshape(-1, 1)
+        B = np.vstack(self.Bs_mu)
+        self.beta_mu = np.linalg.lstsq(B, A).reshape(-1)
+
+        r = self.alphas - self.mus
+        self.Sigma = np.dot(r.T, r)*1./self.J
 
     def sample(self):
         for lmn, mu in zip(self.logistic_m_normals, self.mus):
             lmn.set_prior({'mu': mu, 'Sigma': self.Sigma, 'Q': self.invSigma})
             lmn.sample()
-        self.alphas = np.vstack([lmn.alpha for lmn in self.logistic_m_normals])
+        self.update_alphas()
 
         self.multivariatenormal_regression.setData(Y=self.alphas, QY=np.tile(self.invSigma, (self.J, 1, 1)))
         self.beta_mu = self.multivariatenormal_regression.sample()
-        self.mus = [np.dot(B_i_mu, self.beta_mu) for B_i_mu in self.Bs_mu]
 
         self.inv_wishart.set_data(self.alphas-self.mus)
         self.Sigma = self.inv_wishart.sample()
-        self.invSigma = np.linalg.inv(self.Sigma)
+
+    @property
+    def beta_mu(self):
+        return self._mus
+
+    @beta_mu.setter
+    def beta_mu(self, beta_mu):
+        self._beta_mu = beta_mu
+        self.mus = [np.dot(Bj_mu, self.beta_mu) for Bj_mu in self.Bs_mu]
+
+    @property
+    def Sigma(self):
+        return self._Sigma
+
+    @Sigma.setter
+    def Sigma(self, Sigma):
+        self._Sigma = Sigma
+        self.invSigma = np.linalg.inv(self._Sigma)
+
+    def update_alphas(self):
+        self.alphas = np.vstack([lmn.alpha for lmn in self.logistic_m_normals])
+
+        
 
 
 
