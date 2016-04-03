@@ -60,9 +60,8 @@ class LogisticRegressionPrior(object):
 
             Necessary to do set_covariates first!
         '''
-        self.d = self.Bs_mu[0].shape[0]
-        K_mu = self.Bs_mu[0].shape[1]
-        prior = {'a_mu': np.zeros(K_mu), 'V_mu': 1e6*np.eye(K_mu),
+        
+        prior = {'a_mu': np.zeros(self.m), 'V_mu': 1e6*np.eye(self.m),
                  'W': 1e-6*np.eye(self.d), 'l': self.d}
         if not self.Bs_sigma is None:
             K_sigma = self.Bs_sigma[0].shape[1]
@@ -77,6 +76,9 @@ class LogisticRegressionPrior(object):
             cov_ind -   indices of covariates affecting covariance
         '''
         self.Bs_mu = [B[:, mean_ind] for B in Bs]
+        self.d = self.Bs_mu[0].shape[0]
+        self.m  =self.Bs_mu[0].shape[1]
+        self.J = len(self.Bs_mu)
         self.multivariatenormal_regression.setB(
             np.ascontiguousarray(np.vstack([Bj_mu[np.newaxis, :, :] for Bj_mu in self.Bs_mu]), dtype=np.float))
         if not cov_ind is None:
@@ -92,7 +94,6 @@ class LogisticRegressionPrior(object):
         """
         if not alphas is None:
             self.alphas = alphas
-            self.J = self.alphas.shape[0]
 
             A = self.alphas.reshape(-1, 1)
             B = np.vstack(self.Bs_mu)
@@ -102,10 +103,8 @@ class LogisticRegressionPrior(object):
             self.Sigma = np.dot(r.T, r)*1./self.J
             self.Sigma0 = self.Sigma.copy()
         else:
-            self.d = self.Bs_mu[0].shape[0]
-            K_mu = self.Bs_mu[0].shape[1]
 
-            self.beta_mu = np.zeros(K_mu)
+            self.beta_mu = np.zeros(self.m)
             self.Sigma = np.eye(self.d)
 
         if not self.Bs_sigma is None:
