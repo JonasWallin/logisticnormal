@@ -312,6 +312,10 @@ class LogisticRegression(object):
         return self.logistic_regression_prior.beta_mu
 
     @property
+    def beta_sigma(self):
+        return self.logistic_regression_prior.beta_sigma
+
+    @property
     def Sigma(self):
         return self.logistic_regression_prior.Sigma
 
