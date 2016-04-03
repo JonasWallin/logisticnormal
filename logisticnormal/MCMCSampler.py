@@ -29,7 +29,7 @@ class MCMCSampler(object):
         self.moments[var] = [None]*n_moments
 
     def run(self):
-        self.sampling_object.init()
+        self.sampling_object.initialization()
         self.sampling_object.sample()
 
         for var in self.traces:
