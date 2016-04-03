@@ -25,13 +25,12 @@ class LogisticRegressionPrior(object):
         if not prior is None:
             self.set_prior(prior)
 
-        self.Bs_mu       = None
-        self.Bs_sigma    = None
-        self._Sigma      = None
-        self._Sigmas     = None
-        self._beta_mu    = None
+        self.Bs_mu = None
+        self.Bs_sigma = None
+        self._Sigma = None
+        self._Sigmas = None
+        self._beta_mu = None
         self._beta_sigma = None
-        self._mus        = None
 
     def set_prior(self, prior):
         '''
@@ -45,8 +44,8 @@ class LogisticRegressionPrior(object):
                         V_mu    - prior variance for scaling coeff
         '''
         if self.d is None:
-            self.d = prior['W'].shape[0]
-            self.inv_wishart.set_parameter({'theta': np.zeros((self.d,))})
+            self.d = prior['W'].shape[0]+1
+            self.inv_wishart.set_parameter({'theta': np.zeros((self.d-1,))})
 
         self.multivariatenormal_regression.set_prior(
             {'mu': prior['a_mu'], 'Sigma': prior['V_mu']})
@@ -58,9 +57,10 @@ class LogisticRegressionPrior(object):
     def set_prior_param0(self):
         '''
             Setting non-informative prior.
+
             Necessary to do set_covariates first!
         '''
-        self.d = self.Bs_mu[0].shape[0]
+        self.d = self.Bs_mu[0]
         K_mu = self.Bs_mu[0].shape[1]
         prior = {'a_mu': np.zeros(K_mu), 'V_mu': 1e6*np.eye(K_mu),
                  'W': 1e-6*np.eye(self.d), 'l': self.d}
@@ -106,8 +106,6 @@ class LogisticRegressionPrior(object):
         self.Sigma = np.dot(r.T, r)*1./self.J
         self.Sigma0 = self.Sigma.copy()
 
-
-
     def sample(self):
         """
             samples from the posterior distribution
@@ -147,8 +145,6 @@ class LogisticRegressionPrior(object):
 
     @property
     def mus(self):
-        if self._mus is None:
-            self._mus = np.vstack([np.dot(Bj_mu, self._beta_mu) for Bj_mu in self.Bs_mu])
         return self._mus.copy()
 
     @property
@@ -313,3 +309,4 @@ class LogisticRegression(object):
 
     def update_alphas(self):
         self.alphas = np.vstack([lmn.alpha for lmn in self.logistic_m_normals])
+
