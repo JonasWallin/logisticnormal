@@ -49,8 +49,7 @@ class TestLogisticRegression(unittest.TestCase):
         # covariates
         K = 2
         covars = np.vstack([np.arange(j, K+j) for j in range(J)])
-        print "covars.shape = {}".format(covars.shape)
-        covars = np.vstack([np.ones((J, 1)), covars])
+        covars = np.hstack([np.ones((J, 1)), covars])
         Bs = [np.hstack([covars[j, k]*np.eye(d-1) for k in range(K)]) for j in range(J)]  # [np.tile(range(j, K+j), (d-1, 1)) for j in range(J)]
         mean_ind = np.arange(K*(d-1))
         cov_ind = np.arange(d-1, K*(d-1))
