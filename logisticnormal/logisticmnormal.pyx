@@ -92,6 +92,7 @@ cdef class LogisticMNormal:
 			self.Q		= np.linalg.inv(self.Sigma)
 		self.Q_mu	 = np.dot(self.Q,self.mu)
 		self.d		= self.Q_mu.shape[0] + 1
+		print('self.d = {}'.format(self.d))
 
 	def get_lprior_grad_hess(self, alpha = None):
 	
