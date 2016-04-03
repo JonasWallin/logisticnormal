@@ -88,7 +88,7 @@ class LogisticRegressionPrior(object):
         """
             sets up default starting values
 
-            alphas - vector of ceoffients
+            alphas - vector of coeffients
         """
         if not alphas is None:
             self.alphas = alphas
@@ -100,12 +100,13 @@ class LogisticRegressionPrior(object):
         self.beta_mu = np.linalg.lstsq(B, A)[0].reshape(-1)
         if not self.Bs_sigma is None:
             self.beta_sigma = np.zeros(self.Bs_sigma[0].shape[-1])
+            self.multivariatenormal_scaling.setX(self.beta_sigma)
 
         r = alphas - self.mus
         self.Sigma = np.dot(r.T, r)*1./self.J
         self.Sigma0 = self.Sigma.copy()
 
-        self.multivariatenormal_scaling.setX(np.zeros())
+
 
     def sample(self):
         """
