@@ -128,7 +128,7 @@ cdef class LogisticMNormal:
 		if alpha is None:
 			alpha = self.alpha
 		alpha = alpha.flatten()
-
+		
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] exp_alpha = np.exp(alpha)
 		cdef double c_alpha = (1 + np.sum(exp_alpha))
 		cdef np.ndarray[np.double_t, ndim=1, mode='c'] grad = - self.sum_n * exp_alpha / c_alpha
@@ -232,9 +232,9 @@ cdef class LogisticMNormal:
 		mu_star = alpha_star + LtLg_star * self.sigma_MCMC**2
 		res_old  = self.alpha - mu_star
 		res_star  = alpha_star - mu
-		q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, np.dot(neg_Hessian_old,
+		q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, np.dot(neg_Hessian_star,
 												   res_old))   
-		q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( res_star.T, np.dot(neg_Hessian_star,
+		q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( res_star.T, np.dot(neg_Hessian_old,
 												   res_star) )
 		
 		U = np.random.rand(1)
@@ -298,6 +298,6 @@ cdef class LogisticMNormal:
 		self.n[:] = n_in.flatten()[:]
 		self.sum_n = np.sum(self.n)
 		
-		if (self.alpha is not None) and (self.mu is not None):
-			self.llik, self.grad, self.Hessian = self.get_f_grad_hess(self.alpha)
-			self.L = np.linalg.cholesky(self.Hessian)
+		#if (self.alpha is not None) and (self.mu is not None):
+		#	self.llik, self.grad, self.Hessian = self.get_f_grad_hess(self.alpha)
+		#	self.L = np.linalg.cholesky(self.Hessian)
