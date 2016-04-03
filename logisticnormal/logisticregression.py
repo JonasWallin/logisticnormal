@@ -44,8 +44,8 @@ class LogisticRegressionPrior(object):
                         V_mu    - prior variance for scaling coeff
         '''
         if self.d is None:
-            self.d = prior['W'].shape[0]+1
-            self.inv_wishart.set_parameter({'theta': np.zeros((self.d-1,))})
+            self.d = prior['W'].shape[0]
+            self.inv_wishart.set_parameter({'theta': np.zeros((self.d,))})
 
         self.multivariatenormal_regression.set_prior(
             {'mu': prior['a_mu'], 'Sigma': prior['V_mu']})
@@ -60,7 +60,7 @@ class LogisticRegressionPrior(object):
 
             Necessary to do set_covariates first!
         '''
-        self.d = self.Bs_mu[0]
+        self.d = self.Bs_mu[0].shape[0]
         K_mu = self.Bs_mu[0].shape[1]
         prior = {'a_mu': np.zeros(K_mu), 'V_mu': 1e6*np.eye(K_mu),
                  'W': 1e-6*np.eye(self.d), 'l': self.d}
@@ -92,19 +92,25 @@ class LogisticRegressionPrior(object):
         """
         if not alphas is None:
             self.alphas = alphas
+            self.J = self.alphas.shape[0]
 
-        self.J = self.alphas.shape[0]
+            A = self.alphas.reshape(-1, 1)
+            B = np.vstack(self.Bs_mu)
+            self.beta_mu = np.linalg.lstsq(B, A)[0].reshape(-1)
 
-        A = self.alphas.reshape(-1, 1)
-        B = np.vstack(self.Bs_mu)
-        self.beta_mu = np.linalg.lstsq(B, A)[0].reshape(-1)
+            r = alphas - self.mus
+            self.Sigma = np.dot(r.T, r)*1./self.J
+            self.Sigma0 = self.Sigma.copy()
+        else:
+            self.d = self.Bs_mu[0].shape[0]
+            K_mu = self.Bs_mu[0].shape[1]
+
+            self.beta_mu = np.zeros(K_mu)
+            self.Sigma = np.eye(self.d)
+
         if not self.Bs_sigma is None:
             self.beta_sigma = np.zeros(self.Bs_sigma[0].shape[-1])
             self.multivariatenormal_scaling.setX(self.beta_sigma)
-
-        r = alphas - self.mus
-        self.Sigma = np.dot(r.T, r)*1./self.J
-        self.Sigma0 = self.Sigma.copy()
 
     def sample(self):
         """
@@ -145,6 +151,8 @@ class LogisticRegressionPrior(object):
 
     @property
     def mus(self):
+        if self._mus is None:
+            self._mus = np.vstack([np.dot(Bj_mu, self._beta_mu) for Bj_mu in self.Bs_mu])
         return self._mus.copy()
 
     @property
@@ -309,4 +317,3 @@ class LogisticRegression(object):
 
     def update_alphas(self):
         self.alphas = np.vstack([lmn.alpha for lmn in self.logistic_m_normals])
-
