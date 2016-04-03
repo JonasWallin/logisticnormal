@@ -62,7 +62,6 @@ class LogisticRegressionPrior(object):
         '''
         self.d = self.Bs_mu[0].shape[0]
         K_mu = self.Bs_mu[0].shape[1]
-        print('self.d = {}'.format(self.d))
         prior = {'a_mu': np.zeros(K_mu), 'V_mu': 1e6*np.eye(K_mu),
                  'W': 1e-6*np.eye(self.d), 'l': self.d}
         if not self.Bs_sigma is None:
