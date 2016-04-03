@@ -165,9 +165,9 @@ cdef class MultivariatenormalScalingCython:
 		"""
 			if QY is given SigmaY is not used
 			Y       - (nxd) numpy vector , the data where n number of observation, d - dimension of data
-			SigmaY  - (n x d x d ) numpy vector, the covariance of residuals (y-B * X)
+			SigmaY  - (d x d ) numpy vector, the covariance of residuals (y-B * X)
 			B       - (n x d x k ) numpy vector, the covariates k - dimension of beta 
-			QY      - (n x d x d ) the inverses of SimgaY
+			QY      - (d x d ) the inverse of SimgaY
 		"""
 		if B is not None:
 			self.setB(B)

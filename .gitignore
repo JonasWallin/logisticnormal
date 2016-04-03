@@ -4,5 +4,6 @@ logisticnormal/distribution_cython.c
 logisticnormal/logisticmnormal.c
 build/
 dist/
+prof/
 logisticnormal.egg-info/
 *.DS_Store
