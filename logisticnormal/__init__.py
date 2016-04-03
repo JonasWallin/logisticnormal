@@ -1,6 +1,6 @@
 from .distribution_cython import Multivariatenormal, invWishart, Wishart  # @UnresolvedImport
 from .distribution_cython import MultivariatenormalRegression  # @UnresolvedImport
-from .priors import normal_p_wishart, Wishart_p_nu
+from .priors import normal_p_wishart, Wishart_p_nu, MultivariatenormalScaling
 from .logisticmnormal import LogisticMNormal  # @UnresolvedImport
 from .logisticregression import LogisticRegression
 from .MCMCSampler import LogisticRegressionSampler
@@ -11,5 +11,6 @@ __all__ = ['Multivariatenormal',
            'Wishart_p_nu',
            'LogisticMNormal',
            'MultivariatenormalRegression',
+           'MultivariatenormalScaling',
            'LogisticRegression',
            'LogisticRegressionSampler']

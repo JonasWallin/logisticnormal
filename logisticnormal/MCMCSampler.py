@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 class MCMCSampler(object):
@@ -39,6 +40,7 @@ class MCMCSampler(object):
             val = getattr(self.sampling_object, var)
             self.moments[var] = [np.zeros_like(val) for m in range(1, len(self.moments[var])+1)]
 
+        t0 = time.time()
         for i in range(self.sim):
             self.sampling_object.sample()
 
@@ -52,6 +54,8 @@ class MCMCSampler(object):
                     val = getattr(self.sampling_object, var)
                     for m, mom in enumerate(self.moments[var]):
                         mom += val**(m+1)
+        t1 = time.time()
+        print "Time per iteration: = {}".format((t1-t0)/self.sim)
 
 
 class LogisticRegressionSampler(MCMCSampler):
