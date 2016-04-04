@@ -106,7 +106,7 @@ class LogisticRegressionPrior(object):
 
             self.beta_mu = np.zeros(self.m)
             self.Sigma = np.eye(self.d)
-
+            self.inv_wishart.set_parameter({'theta': np.zeros((self.d,))})
         if not self.Bs_sigma is None:
             self.beta_sigma = np.zeros(self.Bs_sigma[0].shape[-1])
             self.multivariatenormal_scaling.setX(self.beta_sigma)
@@ -135,6 +135,7 @@ class LogisticRegressionPrior(object):
         else:
             #print "len(self.mus) = {}".format(len(self.mus))
             self.inv_wishart.set_data(self.alphas-self.mus)
+            print(self.alphas-self.mus)
             self.Sigma = self.inv_wishart.sample()  # this also defines self.Sigmas, self.invSigmas
 
     @property
