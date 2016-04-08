@@ -90,4 +90,6 @@ class TestLogisticRegression(unittest.TestCase):
 
 
 if __name__ == '__main__':
+ #   suite = unittest.TestLoader().loadTestsFromTestCase(TestLogisticRegression)
+ #   suite.debug()
     unittest.main()

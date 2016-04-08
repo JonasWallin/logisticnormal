@@ -128,11 +128,11 @@ class LogisticRegressionPrior(object):
         self.beta_mu = self.multivariatenormal_regression.sample()
         if not self.Bs_sigma is None:
             self.multivariatenormal_scaling.setData(
-                Y=self.alphas-self.mus, SigmaY=self.Sigma0)
+                Y=self.alphas-self.mus, SigmaY=self.Sigma)
             self.beta_sigma = self.multivariatenormal_scaling.sample()
 
             self.inv_wishart.set_data(np.exp(-np.vstack(self.Bj_beta_sigmas))*(self.alphas-self.mus))
-            self.Sigma0 = self.inv_wishart.sample()  # this also defines self.Sigmas, self.invSigmas
+            self.Sigma = self.inv_wishart.sample()  # this also defines self.Sigmas, self.invSigmas
         else:
             #print "len(self.mus) = {}".format(len(self.mus))
             self.inv_wishart.set_data(self.alphas-self.mus)
@@ -179,28 +179,15 @@ class LogisticRegressionPrior(object):
     def Sigmas(self):
         if self.Bs_sigma is None:
             return [self.Sigma]*self.J
-        return [exp_Bj_beta_sigma.reshape(-1, 1)*self.Sigma0*exp_Bj_beta_sigma.reshape(1, -1)
+        return [exp_Bj_beta_sigma.reshape(-1, 1)*self.Sigma*exp_Bj_beta_sigma.reshape(1, -1)
                 for exp_Bj_beta_sigma in self.exp_Bj_beta_sigmas]
 
     @property
     def invSigmas(self):
         if self.Bs_sigma is None:
             return [self.invSigma]*self.J
-        return [1./exp_Bj_beta_sigma.reshape(-1, 1)*self.invSigma0*1./exp_Bj_beta_sigma.reshape(1, -1)
+        return [1./exp_Bj_beta_sigma.reshape(-1, 1)*self.invSigma*1./exp_Bj_beta_sigma.reshape(1, -1)
                 for exp_Bj_beta_sigma in self.exp_Bj_beta_sigmas]
-
-    @property
-    def Sigma0(self):
-        return self._Sigma0
-
-    @Sigma0.setter
-    def Sigma0(self, Sigma0):
-        self._Sigma0 = Sigma0
-        self._invSigma0 = np.linalg.inv(Sigma0)
-
-    @property
-    def invSigma0(self):
-        return self._invSigma0
 
     @property
     def Sigma(self):
@@ -210,10 +197,14 @@ class LogisticRegressionPrior(object):
     def Sigma(self, Sigma):
         if self._Sigma is None:
             self._Sigma = np.zeros_like(Sigma)
-            self.invSigma = np.zeros_like(Sigma)
+            self._invSigma = np.zeros_like(Sigma)
 
         self._Sigma[:] = Sigma[:]
-        self.invSigma[:] = np.linalg.inv(self._Sigma)[:]
+        self._invSigma[:] = np.linalg.inv(self._Sigma)[:]
+
+    @property
+    def invSigma(self):
+        return self._invSigma
 
     @property
     def alphas(self):
