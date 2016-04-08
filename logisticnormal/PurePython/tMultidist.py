@@ -12,7 +12,12 @@ import numpy.random as npr
 import scipy.special as sps
 
 class tMd(object):
+    """
     
+        
+            Y = \mu + \sqrt{v} L^{-T}z 
+            v \sim INVGAMMA( nu/2, nu/2)
+    """
     def __init__(self, data = None):
         
         
@@ -85,13 +90,40 @@ class tMd(object):
         d = self.mu.shape[0]
         X = np.zeros((n, d))
         for i in range(n):
-            g = self.nu / npr.gamma(shape = self.nu)
+            g = (0.5 * self.nu) / npr.gamma(shape = self.nu* 0.5)
             Xt = self.mu + np.sqrt(g) * np.linalg.solve(self.L,  npr.randn(d))
             X[i, :] = Xt
         return X
         
+    def weights(self, mu = None, L = None , nu = None):
+        """
+            computes the posteriror expectation E[v^{-1}|Y]
+            where v is the variance component of
+            Y = \mu + \sqrt{v} L^{-T}z 
+        """
+        if mu is None:
+            mu = self.mu
+        if L is None:
+            L = self.L
+        if nu is None:
+            nu = self.nu
+            
+        
+        res = np.dot(self.data - mu, L.T)
+        beta  = 0.5 * (np.sum(res**2,1) + nu)
+        alpha = 0.5  *(nu + 1)
+        return alpha / beta
+        
 
-    
+    def set_theta(self, theta):
+        
+        d = self.data.shape[1]
+        mu = theta[:d]
+        L = np.diag(np.exp(theta[d:(2*d)]))
+        L[np.tril_indices(d, k = -1)] = theta[(2*d):((2*d) + d*(d -1)/2 )]
+        self.mu  = mu
+        self.L   = L
+        
     def f_lik(self, theta):
         """
             function for minizing the loglikelihood
