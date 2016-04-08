@@ -91,9 +91,9 @@ class Multivariatenormal(object):
 			mu_sample = self.Q_pmu_p
 			Sigma_sample = self.Q_p
 			
-		R = np.linalg.cholesky(Sigma_sample)
-		X = np.linalg.solve(R, mu_sample)
-		X = np.linalg.solve(R.T, X + np.random.randn(self.d))
+		L = np.linalg.cholesky(Sigma_sample)
+		X = np.linalg.solve(L, mu_sample)
+		X = np.linalg.solve(L.T, X + np.random.randn(self.d))
 		self.X = np.zeros_like(X)
 		self.X[:] = X[:]
 		return X

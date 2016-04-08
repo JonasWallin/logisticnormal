@@ -731,10 +731,8 @@ cdef class invWishart:
         """
             return X
         """
-        print("self.d = {}".format( self.d))
         self.Q_sample[:] = self.Q[:] 
         if self.n != 0:
-            print("self.theta_outer = {}".format(self.theta_outer))
             self.Q_sample += self.n * self.theta_outer
             Temp = np.outer(self.sumY, self.theta)
             self.Q_sample -= Temp + Temp.T

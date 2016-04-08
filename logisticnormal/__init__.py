@@ -4,6 +4,7 @@ from .priors import normal_p_wishart, Wishart_p_nu, MultivariatenormalScaling
 from .logisticmnormal import LogisticMNormal  # @UnresolvedImport
 from .logisticregression import LogisticRegression, LogisticRegressionPrior
 from .MCMCSampler import LogisticRegressionSampler
+from PurePython import tMd
 __all__ = ['Multivariatenormal',
            'normal_p_wishart',
            'invWishart',
@@ -13,5 +14,6 @@ __all__ = ['Multivariatenormal',
            'MultivariatenormalRegression',
            'MultivariatenormalScaling',
            'LogisticRegression',
-           'LogisticRegressionSampler'
-           'LogisticRegressionPrior']
+           'LogisticRegressionSampler',
+           'LogisticRegressionPrior',
+           'tMd']

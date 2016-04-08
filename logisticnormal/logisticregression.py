@@ -102,6 +102,7 @@ class LogisticRegressionPrior(object):
             r = alphas - self.mus
             self.Sigma = np.dot(r.T, r)*1./self.J
             self.Sigma0 = self.Sigma.copy()
+            self.inv_wishart.set_parameter({'theta': np.zeros((self.d,))})
         else:
 
             self.beta_mu = np.zeros(self.m)
@@ -135,7 +136,6 @@ class LogisticRegressionPrior(object):
         else:
             #print "len(self.mus) = {}".format(len(self.mus))
             self.inv_wishart.set_data(self.alphas-self.mus)
-            print(self.alphas-self.mus)
             self.Sigma = self.inv_wishart.sample()  # this also defines self.Sigmas, self.invSigmas
 
     @property
