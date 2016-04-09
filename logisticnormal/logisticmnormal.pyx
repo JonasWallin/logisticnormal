@@ -123,6 +123,8 @@ cdef class LogisticMNormal:
         """
         llik, grad, Hessian    = self.get_llik_grad_hess(alpha)
         llik2, grad2, Hessian2 = self.get_lprior_grad_hess(alpha)
+        if np.isinf(llik):
+            return llik, None, None
         llik += llik2
         grad += grad2
         Hessian += Hessian2

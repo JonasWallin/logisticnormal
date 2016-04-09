@@ -26,6 +26,8 @@ metadata = dict(
       packages=['logisticnormal', 'logisticnormal.PurePython',
                 'logisticnormal.utils'],
       package_dir={'logisticnormal': 'logisticnormal/'},
+      setup_requires = ['pytest-runner'],
+      tests_require = ['pytest'],
       ext_modules=cythonize(
           [Extension("logisticnormal.distribution_cython",
                      sources=["logisticnormal/distribution_cython.pyx",
