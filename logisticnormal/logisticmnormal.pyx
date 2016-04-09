@@ -137,13 +137,19 @@ cdef class LogisticMNormal:
         if alpha is None:
             alpha = self.alpha
         alpha = alpha.flatten()
+        cdef np.ndarray[np.double_t, ndim=2, mode='c'] Hessian  =  np.empty((self.d -1 ,self.d -1))
         
         cdef np.ndarray[np.double_t, ndim=1, mode='c'] exp_alpha = np.exp(alpha)
+        
+        
+        
         cdef double c_alpha = (1 + np.sum(exp_alpha))
-        cdef np.ndarray[np.double_t, ndim=1, mode='c'] grad = - self.sum_n * exp_alpha / c_alpha
+        if c_alpha == np.Inf:
+            return np.Inf, None, None
+        cdef np.ndarray[np.double_t, ndim=1, mode='c'] grad  = - self.sum_n * exp_alpha / c_alpha
 
         exp_alpha *= np.sqrt(self.sum_n)/c_alpha
-        cdef np.ndarray[np.double_t, ndim=2, mode='c'] Hessian  =  np.empty((self.d -1 ,self.d -1))
+        
         outer_Y(<double *>  &Hessian[0,0],<double *>  &exp_alpha[0], 1, exp_alpha.shape[0])
         #Hessian =   np.outer(exp_alpha.T, exp_alpha) 
         Hessian +=  np.diag(grad)
@@ -200,18 +206,23 @@ cdef class LogisticMNormal:
         if alpha is None:
             store = True
             alpha = self.alpha
-            
-        llik, grad,  neg_Hessian = self.get_f_grad_hess(alpha)
-        neg_Hessian *= -1
-        L    = np.linalg.cholesky(neg_Hessian)
-        Lg   = np.linalg.solve(L, grad)
-        LtLg = np.linalg.solve(L.T, 0.5 * Lg)
         
-        if store:
-            self.llik, self.grad, self.neg_Hessian = llik, grad, neg_Hessian
-            self.L    = L
-            self.Lg   = Lg
-            self.LtLg = LtLg
+        L  = None
+        Lg = None
+        LtLg = None
+        
+        llik, grad,  neg_Hessian = self.get_f_grad_hess(alpha)
+        if np.isinf(llik) == 0:
+            neg_Hessian *= -1
+            L    = np.linalg.cholesky(neg_Hessian)
+            Lg   = np.linalg.solve(L, grad)
+            LtLg = np.linalg.solve(L.T, 0.5 * Lg)
+            
+            if store:
+                self.llik, self.grad, self.neg_Hessian = llik, grad, neg_Hessian
+                self.L    = L
+                self.Lg   = Lg
+                self.LtLg = LtLg
         
         return llik, grad, neg_Hessian, L, Lg, LtLg
     
@@ -235,25 +246,25 @@ cdef class LogisticMNormal:
         mu         = self.alpha  + LtLg_old *self.sigma_MCMC**2
         alpha_star = np.linalg.solve(L_old.T, self.sigma_MCMC*z) + mu 
         llik_star, grad_star, neg_Hessian_star, _, __, LtLg_star = self.update_llik(alpha_star)
-        
-        mu_star = alpha_star + LtLg_star * self.sigma_MCMC**2
-        res_old  = self.alpha - mu_star
-        res_star  = alpha_star - mu
-        q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, np.dot(neg_Hessian_star,
-                                                   res_old))   
-        q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( res_star.T, np.dot(neg_Hessian_old,
-                                                   res_star) )
-        
-        U = np.random.rand(1)
-
-        if np.log(U) < llik_star - llik_old + q_o - q_s:       
-            self.accept_mcmc  += 1
-            self.amcmc_accept += 1
-            self.alpha = alpha_star
+        if np.isinf(llik_star) == 0:
+            
+            mu_star = alpha_star + LtLg_star * self.sigma_MCMC**2
+            res_old  = self.alpha - mu_star
+            res_star  = alpha_star - mu
+            q_o = -(0.5/self.sigma_MCMC**2) *  np.dot( res_old, np.dot(neg_Hessian_star,
+                                                       res_old))   
+            q_s = -(0.5/self.sigma_MCMC**2) *  np.dot( res_star.T, np.dot(neg_Hessian_old,
+                                                       res_star) )
+            
+            U = np.random.rand(1)
+    
+            if np.log(U) < llik_star - llik_old + q_o - q_s:       
+                self.accept_mcmc  += 1
+                self.amcmc_accept += 1
+                self.alpha = alpha_star
         
             
         if self.AMCMC:
-            
             self.update_AMCMC()
             
         alpha    = np.zeros_like(self.alpha)

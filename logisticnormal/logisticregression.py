@@ -50,7 +50,7 @@ class LogisticRegressionPrior(object):
         self.multivariatenormal_regression.set_prior(
             {'mu': prior['a_mu'], 'Sigma': prior['V_mu']})
         if 'a_sigma' in prior:
-            self.multivariatenormal_scaling.set_prior(
+            self.multivariatenormal_scaling.setprior(
                 {'mu': prior['a_sigma'], 'Sigma': prior['V_sigma']})
         self.inv_wishart.set_prior({'Q': prior['W'], 'nu': prior['l']})
 

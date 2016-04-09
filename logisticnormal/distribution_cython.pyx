@@ -60,9 +60,9 @@ cdef class MultivariatenormalScalingCython:
         '''
         self.n = 0
         if not prior is None:
-            self.set_prior(prior)
+            self.setprior(prior)
 
-    def set_prior(self, prior):
+    def setprior(self, prior):
         
         self.mu_p = np.empty_like(prior['mu'])
         self.mu_p[:] = prior['mu'][:]
