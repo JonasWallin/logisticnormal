@@ -108,14 +108,14 @@ class test_pythonWishart(unittest.TestCase,Wishart_base):
 
 
 	def setUp(self):
-		print "pyth"
+		print("pyth")
 		self.Wishart = Wis_python
 
 class test_Wishart(unittest.TestCase,Wishart_base):
 
 
 	def setUp(self):
-		print "wish"
+		print("wish")
 		self.Wishart = Wishart
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 import numpy as np
 cimport numpy as np
 cimport cython
-import cPickle as pickle
+import pickle
 cdef extern void outer_Y(double* YYt, const double* Y, const int n, const int d) nogil
 
 
@@ -54,7 +54,7 @@ cdef class LogisticMNormal:
         """
             store object in file
         """
-        f = file(filename, 'wb')
+        f = open(filename, 'wb')
         pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
@@ -66,7 +66,7 @@ cdef class LogisticMNormal:
             
             object = Multivariatenormal.unpickle(filename)
         """
-        with file(filename, 'rb') as f:
+        with open(filename, 'rb') as f:
             return pickle.load(f)    
 
 

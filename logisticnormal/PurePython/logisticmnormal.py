@@ -8,7 +8,7 @@ from __future__ import division
 
 import numpy as np
 import numpy.random as npr
-import cPickle as pickle
+import pickle
 
 #DONE: simulerings test som visar att samplingen funkar (Done)
 #DONE: AMCMC version (Done)
@@ -30,7 +30,7 @@ class LogisticMNormal(object):
 		"""
 			store object in file
 		"""
-		f = file(filename, 'wb')
+		f = open(filename, 'wb')
 		pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 		f.close()
 
@@ -42,7 +42,7 @@ class LogisticMNormal(object):
 
 			object = Multivariatenormal.unpickle(filename)
 		"""
-		with file(filename, 'rb') as f:
+		with open(filename, 'rb') as f:
 			return pickle.load(f)
 
 	def __init__(self, prior = None):

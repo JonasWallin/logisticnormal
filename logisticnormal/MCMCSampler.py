@@ -64,7 +64,7 @@ class MCMCSampler(object):
                     for m, mom in enumerate(self.moments[var]):
                         mom += val**(m+1)
         t1 = time.time()
-        print "Time per iteration: = {}".format((t1-t0)/self.sim)
+        print("Time per iteration: = {}".format((t1-t0)/self.sim))
 
 
 class LogisticRegressionSampler(MCMCSampler):
