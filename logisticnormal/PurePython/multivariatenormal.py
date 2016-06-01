@@ -6,7 +6,7 @@ Created on Jun 30, 2014
 import copy as cp
 import numpy as np
 
-import cPickle as pickle
+import pickle
 
 
 class Multivariatenormal(object):
@@ -19,7 +19,7 @@ class Multivariatenormal(object):
 		"""
 			store object in file
 		"""
-		f = file(filename, 'wb')
+		f = open(filename, 'wb')
 		pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 		f.close()
 
@@ -31,7 +31,7 @@ class Multivariatenormal(object):
 			
 			object = Multivariatenormal.unpickle(filename)
 		"""
-		with file(filename, 'rb') as f:
+		with open(filename, 'rb') as f:
 			return pickle.load(f)	
 		
 	def __init__(self, param = None ,prior = None):
